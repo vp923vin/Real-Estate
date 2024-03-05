@@ -7,13 +7,12 @@ const generateToken = (payload) => {
 const verifyToken = (token) => {
     try {
         const decoded = jwt.verify(token, secretKey);
-        return decoded;
+        return { valid: true, payload: decoded };
     } catch (error) {
         console.error('JWT verification failed:', error.message);
-        return null;
+        return { valid: false, error: error.message };
     }
 };
-
 module.exports = {
     generateToken,
     verifyToken
