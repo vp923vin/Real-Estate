@@ -9,7 +9,7 @@ const isAuth = (req, res, next) => {
         return res.status(401).json({
             status: false,
             message: 'Unauthorized Request'
-        }, 401);
+        });
     }
 
     const token = authHeader.split(' ')[1];
