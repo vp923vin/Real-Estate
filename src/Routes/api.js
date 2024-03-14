@@ -6,8 +6,7 @@ const router = Express.Router();
 const { registerUser } = require('../Controllers/Api/Auth/registerController');
 const { loginUser, logoutUser } = require('../Controllers/Api/Auth/loginController');
 const { contactUserDetails } = require('../Controllers/Api/Contact/ContactController');
-
-
+const { getAllBlogsWithPagination, getBlogById } = require('../Controllers/Api/Blog/BlogController');
 
 
 
@@ -15,11 +14,14 @@ const { contactUserDetails } = require('../Controllers/Api/Contact/ContactContro
 // example route 
 // router.get(url, conntrollerMethod);
 
-// api routes here
+// api routes here users side
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.get('/logout', isAuth, logoutUser);
-router.get('/contact', contactUserDetails);
+router.post('/contact', contactUserDetails);
+router.get('/blogs', getAllBlogsWithPagination);
+router.get('/blog/:id', getBlogById);
 
+// admin side api routes here
 
 module.exports = { apiRoutes: router };

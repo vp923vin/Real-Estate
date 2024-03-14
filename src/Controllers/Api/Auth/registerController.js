@@ -1,5 +1,5 @@
 const UserModel = require('../../../Models/UserModel');
-
+const { hashPassword } = require('../../../Utils/hashPassword');
 const registerUser = async (req, res) => {
     try {
         const { name, email, phone, password } = req.body;
@@ -10,12 +10,12 @@ const registerUser = async (req, res) => {
                 message: 'User already exists'
             });
         }
-
+        const hashedPassword = await hashPassword(password);
         const newUser = new UserModel({
             name,
             email,
             phone,
-            password
+            password: hashedPassword
         });
 
         await newUser.save();

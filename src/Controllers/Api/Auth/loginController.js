@@ -1,9 +1,11 @@
 const UserModel = require('../../../Models/UserModel');
-
+const bcrypt = require('bcrypt');
+const { generateToken, verifyToken } = require('../../../Utils/tokenMethods');
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await UserModel.findOne({ email });
+       
+        const user = await UserModel.findOne({ email }).lean();
         if (!user) {
             return res.status(404).json({
                 status: false,
@@ -13,9 +15,9 @@ const loginUser = async (req, res) => {
 
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
-            return res.status(401).json({
+            return res.status(400).json({
                 status: false,
-                message: 'Password and confirm password mismatch'
+                message: 'Invalid Credentials'
             });
         }
 
@@ -37,7 +39,10 @@ const loginUser = async (req, res) => {
 
 
 const logoutUser = (req, res) => {
-    
+    return res.status(200).json({
+        status: true,
+        message: 'Logout successful'
+    });
 };
 
 module.exports = {
