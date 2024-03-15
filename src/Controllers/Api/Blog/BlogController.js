@@ -1,5 +1,6 @@
 const Category = require('../../../Models/BlogCategoryModel');
 const BlogPost = require('../../../Models/BlogModel');
+const moment = require('moment');
 
 // admin  methods
 const createBlogPost = async (req, res) => {
@@ -21,7 +22,6 @@ const createBlogPost = async (req, res) => {
         });
 
         const savedPost = await newPost.save();
-        console.log('Blog post created:', savedPost);
         return res.status(201).json({
             status: 'success',
             message: "Blog post saved successfully",
@@ -63,7 +63,6 @@ const editBlogPost = async (req, res) => {
         existingPost.authorBio = authorBio;
 
         const updatedPost = await existingPost.save();
-        console.log('Blog post updated:', updatedPost);
         
         // Send response with the updated post
         return res.status(200).json({
@@ -157,9 +156,9 @@ const getAllBlogs = async (req, res) => {
     }
 };
 
+
+
 // user methods
-
-
 const getAllBlogsWithPagination = async (req, res) => {
     try {
         let { page, limit } = req.query;
@@ -195,6 +194,9 @@ const getBlogById = async (req, res) => {
             });
         }
 
+        blog.views += 1;
+        await blog.save();
+
         return res.status(200).json({
             status: true,
             message: 'Blog post retrieved successfully',
@@ -209,6 +211,28 @@ const getBlogById = async (req, res) => {
     }
 };
 
+const getTrendingBlogs = async (req, res) => {
+    const oneWeekAgo = moment().subtract(1, 'week').toDate();
+    const currentDate = new Date(); 
+    console.log(oneWeekAgo, currentDate)
+    try {
+        const trendingBlogs = await BlogPost.find({
+            views: { $gt: 0 }, 
+            created_at: { $gte: oneWeekAgo, $lte: currentDate } 
+        })
+        .sort({ views: -1 }) 
+        .limit(10);
+    
+        res.status(200).json({
+            status: true,
+            message: 'Trending blogs retrieved successfully',
+            data: trendingBlogs
+        });
+    } catch (error) {
+        console.error('Error fetching trending blogs:', error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
 
 module.exports = { 
     createBlogPost, 
@@ -217,6 +241,7 @@ module.exports = {
     deleteMultipleBlogPosts, 
     getAllBlogs, 
     getAllBlogsWithPagination,
-    getBlogById
+    getBlogById,
+    getTrendingBlogs
 };
 

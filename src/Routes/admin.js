@@ -13,6 +13,4 @@ router.delete('/blog/delete/:id', deleteBlogPost);
 router.post('/blog/delete/multiple', deleteMultipleBlogPosts);
 
 
-
-
 module.exports = { adminApiRoutes: router };
