@@ -22,6 +22,12 @@ const {
     contactUserByEmail
 } = require('../../src/Controllers/Api/Contact/ContactController');
 
+const {
+    addTestimonial,
+    editTestimonial,
+    deleteTestimonial,
+    deleteMultipleTestimonials
+} = require('../../src/Controllers/Api/Testimonial/TestimonialController');
 
 // define routes
 router.get('/blog/all-blog-posts', getAllBlogs);
@@ -39,4 +45,10 @@ router.get('/contact/list-all', getAllContacts);
 router.delete('/contact/delete/:id', deleteContactById);
 router.post('/contact/delete/multiple', deleteMultipleContacts);
 router.get('/contact/user/email/:id', contactUserByEmail);
+
+router.post('/testimonials/create', addTestimonial);
+router.put('/testimonials/update/:id', editTestimonial);
+router.delete('/testimonials/delete/:id', deleteTestimonial);
+router.post('/testimonials/delete/multiple', deleteMultipleTestimonials);
+
 module.exports = { adminApiRoutes: router };

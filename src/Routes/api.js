@@ -7,6 +7,7 @@ const { registerUser } = require('../Controllers/Api/Auth/registerController');
 const { loginUser, logoutUser } = require('../Controllers/Api/Auth/loginController');
 const { contactUserDetails } = require('../Controllers/Api/Contact/ContactController');
 const { getAllBlogsWithPagination, getBlogById, getTrendingBlogs } = require('../Controllers/Api/Blog/BlogController');
+const { getLatestTestimonials, getAllTestimonials } = require('../Controllers/Api/Testimonial/TestimonialController');
 
 
 
@@ -23,6 +24,7 @@ router.get('/blogs', getAllBlogsWithPagination);
 router.get('/blog/trendings/', getTrendingBlogs);
 router.get('/blog/:id', getBlogById);
 
-// admin side api routes here
+router.get('/testimonials/latest', getLatestTestimonials);
+router.get('/testimonials/all', getAllTestimonials);
 
 module.exports = { apiRoutes: router };
