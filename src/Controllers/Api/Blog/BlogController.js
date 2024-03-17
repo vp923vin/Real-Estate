@@ -247,7 +247,6 @@ const allCategory = async (req, res) => {
     }
 };
 
-
 const deleteCategories = async (req, res) => {
     try {
         const { ids } = req.body;
@@ -281,7 +280,6 @@ const deleteCategories = async (req, res) => {
         });
     }
 };
-
 
 // user methods
 const getAllBlogsWithPagination = async (req, res) => {
