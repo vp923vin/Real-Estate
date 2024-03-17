@@ -156,6 +156,131 @@ const getAllBlogs = async (req, res) => {
     }
 };
 
+const createCategory = async (req, res) => {
+    try {
+        let { name } = req.body;
+        let count = 1;
+
+        // Check if the category name already exists
+        let existingCategory = await Category.findOne({ name });
+
+        // If the category name already exists, append a number to it
+        while (existingCategory) {
+            name = `${req.body.name}(${count})`;
+            count++;
+            existingCategory = await Category.findOne({ name });
+        }
+
+        // Create the category with the modified name
+        const category = new Category({ name });
+        await category.save();
+
+        res.status(201).json({ status: true, message: 'Category created successfully', data: category });
+    } catch (error) {
+        console.error('Error creating category:', error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
+
+const updateCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+        const updatedCategory = await Category.findByIdAndUpdate(id, { name }, { new: true });
+        if (!updatedCategory) {
+            return res.status(404).json({ 
+                status: false, 
+                message: 'Category not found' 
+            });
+        }
+        return res.status(200).json({ 
+            status: true, 
+            message: 'Category updated successfully', 
+            data: updatedCategory 
+        });
+    } catch (error) {
+        console.error('Error updating category:', error);
+        return res.status(500).json({ 
+            status: false, 
+            message: 'Internal server error' 
+        });
+    }
+};
+
+const deleteCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedCategory = await Category.findByIdAndDelete(id);
+        if (!deletedCategory) {
+            return res.status(404).json({ 
+                status: false, 
+                message: 'Category not found' 
+            });
+        }
+        return res.status(200).json({ 
+            status: true, 
+            message: 'Category deleted successfully' 
+        });
+    } catch (error) {
+        console.error('Error deleting category:', error);
+        return res.status(500).json({ 
+            status: false, 
+            message: 'Internal server error' 
+        });
+    }
+};
+
+const allCategory = async (req, res) => {
+    try {
+        const categories = await Category.find();
+        return res.json({ 
+            status: true, 
+            message: 'Categories retrieved successfully', 
+            data: categories 
+        });
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        return res.status(500).json({ 
+            status: false, 
+            message: 'Internal server error' 
+        });
+    }
+};
+
+
+const deleteCategories = async (req, res) => {
+    try {
+        const { ids } = req.body;
+
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ 
+                status: false, 
+                message: 'Invalid request format' 
+            });
+        }
+
+        const deletedCategories = await Category.deleteMany({ _id: { $in: ids } });
+
+        if (deletedCategories.deletedCount === 0) {
+            return res.status(404).json({ 
+                status: false, 
+                message: 'No categories found with the provided IDs' 
+            });
+        }
+
+        return res.status(200).json({
+            status: true,
+            message: 'Categories deleted successfully',
+            data: deletedCategories
+        });
+    } catch (error) {
+        console.error('Error deleting categories:', error);
+        return res.status(500).json({ 
+            status: false, 
+            message: 'Internal server error' 
+        });
+    }
+};
 
 
 // user methods
@@ -242,6 +367,11 @@ module.exports = {
     getAllBlogs, 
     getAllBlogsWithPagination,
     getBlogById,
-    getTrendingBlogs
+    getTrendingBlogs,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    allCategory,
+    deleteCategories
 };
 
