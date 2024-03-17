@@ -1,25 +1,57 @@
 const {transporter, gmail } = require('../Config/Email');
-
-const sendEmails = async (payload, templateFile) => {
-    const emailTemplatePath = path.resolve(process.cwd(), 'src', 'Views', 'emails', templateFile);
-    const Html = await ejs.renderFile(emailTemplatePath, payload.userData);
-    const mailOptions = {
-      from: gmail,
-      to: payload.email,
-      subject: payload.subject,
-      html: Html,
-    }
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error);
-        return false;
-      } else {
-        console.log('Email sent: ' + info.response);
-        return true;
-      }
-    });
+const path = require('path');
+const ejs = require('ejs');
+// const sendEmails = async (payload, templateFile) => {
+//   console.log(process.cwd())
+//     const emailTemplatePath = path.resolve(process.cwd(), 'src', 'Views', 'emails', templateFile);
+//     const Html = await ejs.renderFile(emailTemplatePath, payload.userData);
+//     const mailOptions = {
+//       from: gmail,
+//       to: payload.email,
+//       subject: payload.subject,
+//       html: Html,
+//     }
+//     transporter.sendMail(mailOptions, (error, info) => {
+//       if (error) {
+//         console.error(error);
+//         return false;
+//       } else {
+//         console.log('Email sent: ' + info.response);
+//         return true;
+//       }
+//     });
   
-}
+// }
+
+const sendEmails = (payload, templateFile) => {
+  return new Promise((resolve, reject) => {
+      const emailTemplatePath = path.resolve(process.cwd(), 'src', 'Views', 'emails', templateFile);
+      ejs.renderFile(emailTemplatePath, payload.userData, (err, Html) => {
+          if (err) {
+              console.error(err);
+              reject(err); 
+              return;
+          }
+          const mailOptions = {
+              from: gmail,
+              to: payload.email,
+              subject: payload.subject,
+              html: Html,
+          };
+          transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                  console.error(error);
+                  reject(error); 
+                  return;
+              }
+              console.log('Email sent: ' + info.response);
+              resolve(info.response);
+          });
+      });
+  });
+};
+
+
 
 // payload format 
 // payload = {
@@ -31,5 +63,5 @@ const sendEmails = async (payload, templateFile) => {
 // }
 
 module.exports = {
-    sendEmails,
+    sendEmails
 }
