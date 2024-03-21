@@ -13,13 +13,10 @@ const blogPostSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    categories: {
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Category'
-        }],
-        default: null
-    },
+    categories: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category'
+    }],
     tags: {
         type: [String],
         default: []

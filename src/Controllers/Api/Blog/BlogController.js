@@ -140,7 +140,10 @@ const deleteMultipleBlogPosts = async (req, res) => {
 
 const getAllBlogs = async (req, res) => {
     try {
-        const blogs = await BlogPost.find();
+        const blogs = await BlogPost.find().populate({
+            path: 'categories',
+            select: 'name'
+        });
 
         return res.status(200).json({
             status: true,
@@ -290,7 +293,10 @@ const getAllBlogsWithPagination = async (req, res) => {
 
         const startIndex = (page - 1) * limit;
 
-        const blogs = await BlogPost.find()
+        const blogs = await BlogPost.find().populate({
+                path: 'categories',
+                select: 'name -_id'
+            })
             .skip(startIndex)
             .limit(limit);
 
@@ -308,8 +314,11 @@ const getAllBlogsWithPagination = async (req, res) => {
 const getBlogById = async (req, res) => {
     try {
         const { id } = req.params;
-        const blog = await BlogPost.findById(id);
-
+        const blog = await BlogPost.findById(id).populate({
+            path: 'categories',
+            select: 'name -_id'
+        });
+        
         if (!blog) {
             return res.status(404).json({
                 status: false,
@@ -342,6 +351,9 @@ const getTrendingBlogs = async (req, res) => {
         const trendingBlogs = await BlogPost.find({
             views: { $gt: 0 }, 
             created_at: { $gte: oneWeekAgo, $lte: currentDate } 
+        }).populate({
+            path: 'categories',
+            select: 'name -_id'
         })
         .sort({ views: -1 }) 
         .limit(10);

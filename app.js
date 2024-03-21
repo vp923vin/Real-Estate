@@ -8,47 +8,22 @@ const BodyParser = require('body-parser');
 const { connectToMongoDB } = require('./src/Config/Database');
 
 const configRoutes = require('./src/Config/Route');
-const { transporter, gmail } = require('./src/Config/Email');
+// const { transporter, gmail } = require('./src/Config/Email');
 
 const app = Express();
 const PORT = process.env.APP_PORT || 3000;
 
-// app.set('views', path.join(__dirname, 'Views'));
-// app.set('view engine', 'ejs');
 // Set Engine
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "../frontend"));
+app.set('views', path.join(__dirname, 'Views'));
+app.set('view engine', 'ejs');
+
 
 app.use(Express.static('Public'));
 app.use(cors());
 
-const staticDirectories = [
-  "css",
-  "docs",
-  "fonts",
-  "images",
-  "js",
-  "pages",
-  "partials",
-  "scss",
-  "vendors",
-];
-
-staticDirectories.forEach((directory) => {
-  app.use(
-    `/${directory}`,
-    Express.static(path.join(__dirname, `../frontend/${directory}`))
-  );
-});
-
 
 configRoutes(app);
 connectToMongoDB();
-
-// test Email settings example code how to use email settings 
-
-
-// sendTestEmail();
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
