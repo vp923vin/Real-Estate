@@ -29,10 +29,14 @@ const blogPostSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    image: {
+    mainImage: {
         type: String,
         required: true
     },
+    multiImages: [{
+        type: String,
+        default: null
+    }],
     slug: {
         type: String,
         default: null
@@ -44,7 +48,7 @@ const blogPostSchema = new mongoose.Schema({
     authorBio: {
         type: String,
         default: null
-    }, 
+    },
     created_at: {
         type: Date,
         default: Date.now

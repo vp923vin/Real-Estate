@@ -1,12 +1,15 @@
 const Category = require('../../../Models/BlogCategoryModel');
 const BlogPost = require('../../../Models/BlogModel');
+const upload = require('../../../Utils/ImageUpload');
 const moment = require('moment');
 
 // admin  methods
 const createBlogPost = async (req, res) => {
     try {
-        const { title, content, author, categories, tags, likes, views, image, slug, published, authorBio } = req.body;
-
+        const { title, content, author, categories, tags, likes, views, slug, published, authorBio } = req.body;
+        const { mainImage, multiImages } = req.files;
+        const mainImageFilename = mainImage[0].filename;
+        const multiImagesFilenames = (multiImages != null || multiImages != undefined) ? multiImages.map(image => image.filename) : [];
         const newPost = new BlogPost({
             title,
             content,
@@ -15,55 +18,114 @@ const createBlogPost = async (req, res) => {
             tags,
             likes,
             views,
-            image,
             slug,
             published,
-            authorBio
+            authorBio,
+            mainImage: mainImageFilename,
+            multiImages: multiImagesFilenames
+        });
+        newPost.save().then(savedPost => {
+            return res.status(201).json({
+                status: 'success',
+                message: "Blog post saved successfully",
+                data: savedPost
+            });
+        }).catch(error => {
+            console.error('Error saving blog post:', error);
+            return res.status(500).json({
+                status: false,
+                message: 'Internal server error'
+            });
         });
 
-        const savedPost = await newPost.save();
-        return res.status(201).json({
-            status: 'success',
-            message: "Blog post saved successfully",
-            data: savedPost
-        }); 
+
     } catch (error) {
         console.error('Error creating blog post:', error);
-        return res.status(500).json({ 
+        return res.status(500).json({
             status: false,
-            message: 'Internal server error' 
-        }); 
+            message: 'Internal server error'
+        });
     }
 };
+
+// const editBlogPost = async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const { title, content, author, categories, tags, likes, views, image, slug, published, authorBio } = req.body;
+//         const { mainImage, multiImages } = req.files;
+//         const mainImageFilename = mainImage[0].filename;
+//         const multiImagesFilenames = (multiImages != null || multiImages != undefined) ? multiImages.map(image => image.filename) : [];
+        
+//         const existingPost = await BlogPost.findById(id);
+
+//         if (!existingPost) {
+//             return res.status(404).json({
+//                 status: false,
+//                 message: 'Blog post not found'
+//             });
+//         }
+
+//         existingPost.title = title;
+//         existingPost.content = content;
+//         existingPost.author = author;
+//         existingPost.categories = categories;
+//         existingPost.tags = tags;
+//         existingPost.likes = likes;
+//         existingPost.views = views;
+//         existingPost.mainImage = mainImageFilename;
+//         existingPost.multiImages = multiImagesFilenames;
+//         existingPost.slug = slug;
+//         existingPost.published = published;
+//         existingPost.authorBio = authorBio;
+
+//         const updatedPost = await existingPost.save();
+
+//         // Send response with the updated post
+//         return res.status(200).json({
+//             status: true,
+//             message: 'Blog post updated successfully',
+//             data: updatedPost
+//         });
+//     } catch (error) {
+//         console.error('Error editing blog post:', error);
+//         return res.status(500).json({
+//             status: false,
+//             message: 'Internal server error'
+//         });
+//     }
+// };
 
 const editBlogPost = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, content, author, categories, tags, likes, views, image, slug, published, authorBio } = req.body;
+        const updateFields = req.body;
+        const { mainImage, multiImages } = req.files || {}; // Set default values if req.files is undefined
+        const mainImageFilename = mainImage ? mainImage[0].filename : undefined;
+        const multiImagesFilenames = multiImages ? multiImages.map(image => image.filename) : [];
 
+        // Find the existing post
         const existingPost = await BlogPost.findById(id);
-
         if (!existingPost) {
-            return res.status(404).json({ 
-                status: false, 
-                message: 'Blog post not found' 
+            return res.status(404).json({
+                status: false,
+                message: 'Blog post not found'
             });
         }
 
-        existingPost.title = title;
-        existingPost.content = content;
-        existingPost.author = author;
-        existingPost.categories = categories;
-        existingPost.tags = tags;
-        existingPost.likes = likes;
-        existingPost.views = views;
-        existingPost.image = image;
-        existingPost.slug = slug;
-        existingPost.published = published;
-        existingPost.authorBio = authorBio;
+        // Update only the fields provided from the frontend
+        for (const field in updateFields) {
+            if (field === 'mainImage') {
+                existingPost.mainImage = mainImageFilename;
+            } else if (field === 'multiImages') {
+                existingPost.multiImages = multiImagesFilenames;
+            } else if (existingPost[field] !== undefined) {
+                existingPost[field] = updateFields[field];
+            }
+        }
 
+        // Save the updated post
         const updatedPost = await existingPost.save();
-        
+
         // Send response with the updated post
         return res.status(200).json({
             status: true,
@@ -72,22 +134,22 @@ const editBlogPost = async (req, res) => {
         });
     } catch (error) {
         console.error('Error editing blog post:', error);
-        return res.status(500).json({ 
-            status: false, 
-            message: 'Internal server error' 
+        return res.status(500).json({
+            status: false,
+            message: 'Internal server error'
         });
     }
 };
 
 const deleteBlogPost = async (req, res) => {
     try {
-        const { id } = req.params; 
+        const { id } = req.params;
         const deletedPost = await BlogPost.findByIdAndDelete(id);
 
         if (!deletedPost) {
-            return res.status(404).json({ 
-                status: false, 
-                message: 'Blog post not found' 
+            return res.status(404).json({
+                status: false,
+                message: 'Blog post not found'
             });
         }
 
@@ -98,29 +160,29 @@ const deleteBlogPost = async (req, res) => {
         });
     } catch (error) {
         console.error('Error deleting blog post:', error);
-        return res.status(500).json({ 
-            status: false, 
-            message: 'Internal server error' 
+        return res.status(500).json({
+            status: false,
+            message: 'Internal server error'
         });
     }
 };
 
 const deleteMultipleBlogPosts = async (req, res) => {
     try {
-        const { ids } = req.body; 
+        const { ids } = req.body;
         if (!ids || !Array.isArray(ids)) {
-            return res.status(400).json({ 
-                status: false, 
-                message: 'Invalid request format' 
+            return res.status(400).json({
+                status: false,
+                message: 'Invalid request format'
             });
         }
 
         const deletedPosts = await BlogPost.deleteMany({ _id: { $in: ids } });
 
         if (deletedPosts.deletedCount === 0) {
-            return res.status(404).json({ 
-                status: false, 
-                message: 'No blog posts found with the provided IDs' 
+            return res.status(404).json({
+                status: false,
+                message: 'No blog posts found with the provided IDs'
             });
         }
 
@@ -131,9 +193,9 @@ const deleteMultipleBlogPosts = async (req, res) => {
         });
     } catch (error) {
         console.error('Error deleting blog posts:', error);
-        return res.status(500).json({ 
-            status: false, 
-            message: 'Internal server error' 
+        return res.status(500).json({
+            status: false,
+            message: 'Internal server error'
         });
     }
 };
@@ -152,9 +214,9 @@ const getAllBlogs = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching blogs:', error);
-        return res.status(500).json({ 
-            status: false, 
-            message: 'Internal server error' 
+        return res.status(500).json({
+            status: false,
+            message: 'Internal server error'
         });
     }
 };
@@ -191,21 +253,21 @@ const updateCategory = async (req, res) => {
         const { name } = req.body;
         const updatedCategory = await Category.findByIdAndUpdate(id, { name }, { new: true });
         if (!updatedCategory) {
-            return res.status(404).json({ 
-                status: false, 
-                message: 'Category not found' 
+            return res.status(404).json({
+                status: false,
+                message: 'Category not found'
             });
         }
-        return res.status(200).json({ 
-            status: true, 
-            message: 'Category updated successfully', 
-            data: updatedCategory 
+        return res.status(200).json({
+            status: true,
+            message: 'Category updated successfully',
+            data: updatedCategory
         });
     } catch (error) {
         console.error('Error updating category:', error);
-        return res.status(500).json({ 
-            status: false, 
-            message: 'Internal server error' 
+        return res.status(500).json({
+            status: false,
+            message: 'Internal server error'
         });
     }
 };
@@ -215,20 +277,20 @@ const deleteCategory = async (req, res) => {
         const { id } = req.params;
         const deletedCategory = await Category.findByIdAndDelete(id);
         if (!deletedCategory) {
-            return res.status(404).json({ 
-                status: false, 
-                message: 'Category not found' 
+            return res.status(404).json({
+                status: false,
+                message: 'Category not found'
             });
         }
-        return res.status(200).json({ 
-            status: true, 
-            message: 'Category deleted successfully' 
+        return res.status(200).json({
+            status: true,
+            message: 'Category deleted successfully'
         });
     } catch (error) {
         console.error('Error deleting category:', error);
-        return res.status(500).json({ 
-            status: false, 
-            message: 'Internal server error' 
+        return res.status(500).json({
+            status: false,
+            message: 'Internal server error'
         });
     }
 };
@@ -236,16 +298,16 @@ const deleteCategory = async (req, res) => {
 const allCategory = async (req, res) => {
     try {
         const categories = await Category.find();
-        return res.json({ 
-            status: true, 
-            message: 'Categories retrieved successfully', 
-            data: categories 
+        return res.json({
+            status: true,
+            message: 'Categories retrieved successfully',
+            data: categories
         });
     } catch (error) {
         console.error('Error fetching categories:', error);
-        return res.status(500).json({ 
-            status: false, 
-            message: 'Internal server error' 
+        return res.status(500).json({
+            status: false,
+            message: 'Internal server error'
         });
     }
 };
@@ -255,18 +317,18 @@ const deleteCategories = async (req, res) => {
         const { ids } = req.body;
 
         if (!ids || !Array.isArray(ids)) {
-            return res.status(400).json({ 
-                status: false, 
-                message: 'Invalid request format' 
+            return res.status(400).json({
+                status: false,
+                message: 'Invalid request format'
             });
         }
 
         const deletedCategories = await Category.deleteMany({ _id: { $in: ids } });
 
         if (deletedCategories.deletedCount === 0) {
-            return res.status(404).json({ 
-                status: false, 
-                message: 'No categories found with the provided IDs' 
+            return res.status(404).json({
+                status: false,
+                message: 'No categories found with the provided IDs'
             });
         }
 
@@ -277,9 +339,9 @@ const deleteCategories = async (req, res) => {
         });
     } catch (error) {
         console.error('Error deleting categories:', error);
-        return res.status(500).json({ 
-            status: false, 
-            message: 'Internal server error' 
+        return res.status(500).json({
+            status: false,
+            message: 'Internal server error'
         });
     }
 };
@@ -294,9 +356,9 @@ const getAllBlogsWithPagination = async (req, res) => {
         const startIndex = (page - 1) * limit;
 
         const blogs = await BlogPost.find().populate({
-                path: 'categories',
-                select: 'name -_id'
-            })
+            path: 'categories',
+            select: 'name -_id'
+        })
             .skip(startIndex)
             .limit(limit);
 
@@ -318,7 +380,7 @@ const getBlogById = async (req, res) => {
             path: 'categories',
             select: 'name -_id'
         });
-        
+
         if (!blog) {
             return res.status(404).json({
                 status: false,
@@ -336,28 +398,28 @@ const getBlogById = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching blog post:', error);
-        return res.status(500).json({ 
-            status: false, 
-            message: 'Internal server error' 
+        return res.status(500).json({
+            status: false,
+            message: 'Internal server error'
         });
     }
 };
 
 const getTrendingBlogs = async (req, res) => {
     const oneWeekAgo = moment().subtract(1, 'week').toDate();
-    const currentDate = new Date(); 
+    const currentDate = new Date();
     console.log(oneWeekAgo, currentDate)
     try {
         const trendingBlogs = await BlogPost.find({
-            views: { $gt: 0 }, 
-            created_at: { $gte: oneWeekAgo, $lte: currentDate } 
+            views: { $gt: 0 },
+            created_at: { $gte: oneWeekAgo, $lte: currentDate }
         }).populate({
             path: 'categories',
             select: 'name -_id'
         })
-        .sort({ views: -1 }) 
-        .limit(10);
-    
+            .sort({ views: -1 })
+            .limit(10);
+
         res.status(200).json({
             status: true,
             message: 'Trending blogs retrieved successfully',
@@ -369,12 +431,12 @@ const getTrendingBlogs = async (req, res) => {
     }
 };
 
-module.exports = { 
-    createBlogPost, 
-    editBlogPost, 
-    deleteBlogPost, 
-    deleteMultipleBlogPosts, 
-    getAllBlogs, 
+module.exports = {
+    createBlogPost,
+    editBlogPost,
+    deleteBlogPost,
+    deleteMultipleBlogPosts,
+    getAllBlogs,
     getAllBlogsWithPagination,
     getBlogById,
     getTrendingBlogs,

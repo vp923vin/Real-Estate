@@ -1,6 +1,6 @@
 const Express = require('express');
 const router = Express.Router();
-
+const upload = require('../Utils/ImageUpload');
 // define controllers
 const { 
     createBlogPost, 
@@ -12,7 +12,7 @@ const {
     updateCategory,
     deleteCategory,
     allCategory,
-    deleteCategories
+    deleteCategories,
 } = require('../Controllers/Api/Blog/BlogController');
 
 const {
@@ -31,8 +31,14 @@ const {
 
 // define routes
 router.get('/blog/all-blog-posts', getAllBlogs);
-router.post('/blog/create', createBlogPost);
-router.put('/blog/update/:id', editBlogPost);
+router.post('/blog/create', upload.fields([
+    { name: 'mainImage', maxCount: 1 },
+    { name: 'multiImages', maxCount: 10 }
+]), createBlogPost);
+router.put('/blog/update/:id', upload.fields([
+    { name: 'mainImage', maxCount: 1 },
+    { name: 'multiImages', maxCount: 10 }
+]), editBlogPost);
 router.delete('/blog/delete/:id', deleteBlogPost);
 router.post('/blog/delete/multiple', deleteMultipleBlogPosts);
 router.post('/blog/category/create', createCategory);
