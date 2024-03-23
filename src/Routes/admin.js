@@ -29,6 +29,13 @@ const {
     deleteMultipleTestimonials
 } = require('../../src/Controllers/Api/Testimonial/TestimonialController');
 
+const {
+    fetchPropertyDetails,
+    getAllProperties,
+    getPropertyWithPagination
+} = require('../Controllers/Api/Property/PropertyController');
+
+
 // define routes
 router.get('/blog/all-blog-posts', getAllBlogs);
 router.post('/blog/create', upload.fields([
@@ -56,5 +63,12 @@ router.post('/testimonials/create', addTestimonial);
 router.put('/testimonials/update/:id', editTestimonial);
 router.delete('/testimonials/delete/:id', deleteTestimonial);
 router.post('/testimonials/delete/multiple', deleteMultipleTestimonials);
+
+
+// dummy api data routes
+
+router.get('/property/save', fetchPropertyDetails);
+router.get('/property/list/all', getAllProperties);
+router.get('/property/with/pagination', getPropertyWithPagination);
 
 module.exports = { adminApiRoutes: router };
