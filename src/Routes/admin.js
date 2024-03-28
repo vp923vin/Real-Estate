@@ -36,6 +36,15 @@ const {
   getPropertyWithPagination,
   deleteProperty,
 } = require("../Controllers/Api/Property/PropertyController");
+const { 
+  addSampleMetaData, 
+  updateMetaDataById 
+} = require("../Controllers/Api/Meta/MetaDataController");
+const { 
+  getSettingsById,
+  updateSettingsById,
+  addSettings
+} = require("../Controllers/Api/Settings/SettingsController");
 
 // define routes
 router.get("/blog/all-blog-posts", getAllBlogs);
@@ -80,6 +89,13 @@ router.get("/property/list/all", getAllProperties);
 router.get("/property/with/pagination", getPropertyWithPagination);
 router.delete("/property/delete/:id", deleteProperty);
 
+router.get("/meta-data/", addSampleMetaData);
+router.post("/meta-data/update/:id", updateMetaDataById);
+
+
+router.get('/settings/:id', getSettingsById);
+router.put('/settings/update/:id', updateSettingsById);
+router.post('/settings/add', addSettings);
 //Get dashboard information
 router.get("/dashboard/details", dashboard_display_number);
 

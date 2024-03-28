@@ -6,11 +6,13 @@ const router = Express.Router();
 const { registerUser } = require('../Controllers/Api/Auth/registerController');
 const { loginUser, logoutUser } = require('../Controllers/Api/Auth/loginController');
 const { contactUserDetails } = require('../Controllers/Api/Contact/ContactController');
+
 const { 
     getAllBlogsWithPagination, 
     getBlogById, 
     getTrendingBlogs 
 } = require('../Controllers/Api/Blog/BlogController');
+
 const { 
     getLatestTestimonials, 
     getAllTestimonials 
@@ -20,6 +22,11 @@ const {
     searchProperties,
     filterProperties
 } = require('../Controllers/Api/Property/PropertyController');
+
+const { 
+    getMetaDataById, 
+    fetchAllMetaData 
+} = require('../Controllers/Api/Meta/MetaDataController');
 
 
 
@@ -41,5 +48,8 @@ router.get('/testimonials/all', getAllTestimonials);
 
 router.get('/property/search', searchProperties);
 router.get('/property/filter', filterProperties);
+
+router.get('/meta-data/:pageName', getMetaDataById);
+router.get('/meta-data/list/all', fetchAllMetaData);
 
 module.exports = { apiRoutes: router };
