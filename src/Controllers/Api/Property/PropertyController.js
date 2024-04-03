@@ -132,6 +132,24 @@ const deleteProperty = async (req, res) => {
   }
 };
 
+const get_property_by_id = async (req, res) => {
+  try {
+    const { perpertyId } = req.params;
+    const propertiesData = await Property.find({ _id: perpertyId });
+
+    return res.status(200).json({
+      status: true,
+      message: "filtered successfully",
+      data: propertiesData,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   fetchPropertyDetails,
   getAllProperties,
@@ -139,4 +157,5 @@ module.exports = {
   searchProperties,
   filterProperties,
   deleteProperty,
+  get_property_by_id,
 };

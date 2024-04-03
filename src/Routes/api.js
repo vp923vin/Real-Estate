@@ -20,7 +20,8 @@ const {
 
 const {
     searchProperties,
-    filterProperties
+    filterProperties,
+    get_property_by_id
 } = require('../Controllers/Api/Property/PropertyController');
 
 const { 
@@ -48,6 +49,7 @@ router.get('/testimonials/all', getAllTestimonials);
 
 router.get('/property/search', searchProperties);
 router.get('/property/filter', filterProperties);
+router.get('/property/:id', get_property_by_id);
 
 router.get('/meta-data/:pageName', getMetaDataById);
 router.get('/meta-data/list/all', fetchAllMetaData);
