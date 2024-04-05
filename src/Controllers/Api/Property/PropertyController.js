@@ -2,6 +2,7 @@ const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
 const Property = require("../../../Models/PropertyModel");
+const Exclusive = require("../../../Models/ExclusiveModel");
 const { baseUri, port } = require("../../../Config/config");
 
 const fetchPropertyDetails = async (req, res) => {
@@ -134,18 +135,107 @@ const deleteProperty = async (req, res) => {
 
 const get_property_by_id = async (req, res) => {
   try {
-    const { perpertyId } = req.params;
-    const propertiesData = await Property.find({ _id: perpertyId });
+    const { id } = req.params;
+    const propertiesData = await Property.find({ _id: id });
 
+    return res.status(200).json(propertiesData);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const get_exclusive_listing = async (req, res) => {
+  try {
+    const ExclusiveData = await Exclusive.find();
+    console.log(ExclusiveData);
     return res.status(200).json({
       status: true,
       message: "filtered successfully",
-      data: propertiesData,
+      data: ExclusiveData,
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+const get_exclusive_listing_by_id = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ExclusiveData = await Exclusive.find({ _id: id });
+    return res.status(200).json(ExclusiveData);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const post_exclusive_listing = async (req, res) => {
+  try {
+    const {
+      exclusive_price,
+      exclusive_address,
+      exclusive_bedroom,
+      exclusive_bathroom,
+      exclusive_area,
+    } = req.body;
+
+    console.log(req.body);
+
+    // Get the filename of the uploaded image
+    const exclusive_image = req.file.filename;
+
+    const newExclusive = new Exclusive({
+      exclusive_image,
+      exclusive_price,
+      exclusive_address,
+      exclusive_bedroom,
+      exclusive_bathroom,
+      exclusive_area,
+    });
+
+    const savedExclusive = await newExclusive.save();
+
+    res.status(201).json({
+      status: "success",
+      message: "Exclusive property saved successfully",
+      data: savedExclusive,
+    });
+  } catch (error) {
+    console.error("Error uploading exclusive property:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const deleteExlusive = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteExclusive = await Exclusive.findByIdAndDelete(id);
+    if (!deleteExclusive) {
+      return res.status(404).json({
+        success: false,
+        message: "Exclusive not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Exclusive deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting Exclusive:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
@@ -158,4 +248,8 @@ module.exports = {
   filterProperties,
   deleteProperty,
   get_property_by_id,
+  get_exclusive_listing,
+  get_exclusive_listing_by_id,
+  post_exclusive_listing,
+  deleteExlusive,
 };

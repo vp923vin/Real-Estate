@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toggle Switch</title>
+    <style>
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: #ccc;
+        cursor: pointer;
+      }
+
+      .switch-input {
+        display: none;
+      }
+
+      .switch-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #fff;
+        border-radius: 15px;
+        transition: 0.4s;
+      }
+
+      .switch-input:checked + .switch-button {
+        transform: translateX(30px);
+      }
+
+      .switch-button-left,
+      .switch-button-right {
+        display: block;
+        width: 50%;
+        height: 100%;
+        text-align: center;
+        line-height: 30px;
+      }
+
+      .switch-button-left {
+        color: #666666;
+      }
+
+      .switch-input:checked + .switch-button .switch-button-left {
+        color: #fff;
+      }
+
+      .switch-button-right {
+        color: #666;
+      }
+
+      .switch-input:checked + .switch-button .switch-button-right {
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <label class="switch">
+      <input class="switch-input" type="checkbox" />
+      <div class="switch-button">
+        <span class="switch-button-left"></span>
+        <span class="switch-button-right"></span>
+      </div>
+    </label>
+  </body>
+</html>

@@ -1,6 +1,18 @@
 const Express = require("express");
 const router = Express.Router();
 const upload = require("../Utils/ImageUpload");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const uploadSingle = multer({ storage: storage });
 // define controllers
 const {
   createBlogPost,
@@ -35,15 +47,17 @@ const {
   getAllProperties,
   getPropertyWithPagination,
   deleteProperty,
+  post_exclusive_listing,
+  deleteExlusive,
 } = require("../Controllers/Api/Property/PropertyController");
-const { 
-  addSampleMetaData, 
-  updateMetaDataById 
+const {
+  addSampleMetaData,
+  updateMetaDataById,
 } = require("../Controllers/Api/Meta/MetaDataController");
-const { 
+const {
   getSettingsById,
   updateSettingsById,
-  addSettings
+  addSettings,
 } = require("../Controllers/Api/Settings/SettingsController");
 
 // define routes
@@ -89,13 +103,20 @@ router.get("/property/list/all", getAllProperties);
 router.get("/property/with/pagination", getPropertyWithPagination);
 router.delete("/property/delete/:id", deleteProperty);
 
+router.post(
+  "/exclusive/create",
+  uploadSingle.single("exclusive_image"),
+  post_exclusive_listing
+);
+
+router.post("/exclusive/delete/:id", deleteExlusive);
+
 router.get("/meta-data/", addSampleMetaData);
 router.post("/meta-data/update/:id", updateMetaDataById);
 
-
-router.get('/settings/:id', getSettingsById);
-router.put('/settings/update/:id', updateSettingsById);
-router.post('/settings/add', addSettings);
+router.get("/settings/:id", getSettingsById);
+router.put("/settings/update/:id", updateSettingsById);
+router.post("/settings/add", addSettings);
 //Get dashboard information
 router.get("/dashboard/details", dashboard_display_number);
 
