@@ -109,7 +109,7 @@ router.post(
   post_exclusive_listing
 );
 
-router.post("/exclusive/delete/:id", deleteExlusive);
+router.delete("/exclusive/delete/:id", deleteExlusive);
 
 router.get("/meta-data/", addSampleMetaData);
 router.post("/meta-data/update/:id", updateMetaDataById);
