@@ -21,6 +21,7 @@ app.use(Express.static("public"));
 app.use(cors());
 
 app.use('/uploads', Express.static(path.join(__dirname, 'public/assets/uploads')));
+app.use('/uploads', Express.static(path.join(__dirname, 'uploads')));
 
 configRoutes(app);
 connectToMongoDB();
