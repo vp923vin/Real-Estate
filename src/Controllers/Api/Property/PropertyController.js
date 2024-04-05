@@ -147,6 +147,7 @@ const get_property_by_id = async (req, res) => {
   }
 };
 
+//  Exclusive Listing
 const get_exclusive_listing = async (req, res) => {
   try {
     const ExclusiveData = await Exclusive.find();
