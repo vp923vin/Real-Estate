@@ -124,12 +124,12 @@ const filterProperties = async (req, res) => {
             { "mls_number": { $regex: value, $options: "i" } }
           ];
           break;
-          
+
         case 'priceRange':
           // Handle price range filter
           // Assuming value is a string in the format "min-max"
           const [minPrice, maxPrice] = value.split('-');
-          filterCriteria["additional_details.Annual_Property_Taxes"] = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
+          filterCriteria["price"] = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
           break;
         case 'beds':
           // Handle beds filter
@@ -141,11 +141,11 @@ const filterProperties = async (req, res) => {
           break;
         case 'buildingStyle':
           // Handle building style filter
-          filterCriteria["additional_details.Style"] = { $regex: value, $options: "i" };
+          filterCriteria["additional_details.Building_Type"] = { $regex: value, $options: "i" };
           break;
         case 'squareFeet':
           // Handle square feet filter
-          filterCriteria["additional_details.Square_Footage"] = { $gte: parseInt(value) };
+          filterCriteria["area"] = { $gte: parseInt(value) };
           break;
         // Add more cases for other filter criteria as needed
         default:
