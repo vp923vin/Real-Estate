@@ -117,13 +117,13 @@ const filterProperties = async (req, res) => {
     for (const [key, value] of Object.entries(filters)) {
       // Apply different filter conditions based on the filter key
       switch(key) {
-        case 'location':
-          // For location, search in both the address and mls_number fields
-          filterCriteria.$or = [
-            { "address": { $regex: value, $options: "i" } },
-            { "mls_number": { $regex: value, $options: "i" } }
-          ];
-          break;
+        // case 'location':
+        //   // For location, search in both the address and mls_number fields
+        //   filterCriteria.$or = [
+        //     { "address": { $regex: value, $options: "i" } },
+        //     { "mls_number": { $regex: value, $options: "i" } }
+        //   ];
+        //   break;
 
         case 'priceRange':
           // Handle price range filter
@@ -142,6 +142,11 @@ const filterProperties = async (req, res) => {
         case 'buildingStyle':
           // Handle building style filter
           filterCriteria["additional_details.Building_Type"] = { $regex: value, $options: "i" };
+          break;
+
+        case 'PropertyType':
+          // Handle building style filter
+          filterCriteria["additional_details.Property_Type"] = { $regex: value, $options: "i" };
           break;
         case 'squareFeet':
           // Handle square feet filter
