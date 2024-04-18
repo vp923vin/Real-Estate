@@ -92,10 +92,9 @@ const filterProperties = async (req, res) => {
     for (const [key, value] of Object.entries(filters)) {
       // Apply different filter conditions based on the filter key
       switch (key) {
+
         case "priceRange":
-          // Check if filterCriteria["price"] exists and is a string
-          if (typeof filterCriteria["price"] === "string") {
-            // Remove the '$' symbol from the price
+          
             filterCriteria["price"] = parseInt(
               filterCriteria["price"].replace(/\$/g, "")
             );
@@ -104,7 +103,6 @@ const filterProperties = async (req, res) => {
               $gte: parseInt(minPrice),
               $lte: parseInt(maxPrice),
             };
-          }
           break;
 
         case "beds":
