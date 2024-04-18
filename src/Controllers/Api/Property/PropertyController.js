@@ -96,7 +96,8 @@ const filterProperties = async (req, res) => {
 
         case 'priceRange':
           const [minPrice, maxPrice] = value.split('-');
-          filterCriteria["price"] = { $gte: minPrice, $lte: maxPrice };
+          console.log(minPrice , maxPrice)
+          filterCriteria["price"] = { $gte: (minPrice), $lte: (maxPrice) };
           break;
 
         case 'beds':
