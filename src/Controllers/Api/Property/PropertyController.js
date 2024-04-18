@@ -58,17 +58,15 @@ const getPropertyWithPagination = async (req, res) => {
   }
 };
 
-
-
 const searchProperties = async (req, res) => {
   try {
     const { location } = req.query;
 
     const filterQuery = {
       $or: [
-        { "address": { $regex: location, $options: "i" } },
-        { "mls_number": { $regex: location, $options: "i" } }
-      ]
+        { address: { $regex: location, $options: "i" } },
+        { mls_number: { $regex: location, $options: "i" } },
+      ],
     };
 
     const properties = await Property.find(filterQuery);
@@ -87,23 +85,83 @@ const searchProperties = async (req, res) => {
   }
 };
 
-
-
+// const filterProperties = async (req, res) => {
+//   try {
+//     const filters = req.query;
+//     const filterCriteria = {};
+//     for (const [key, value] of Object.entries(filters)) {
+//       filterCriteria[key] = { $regex: value, $options: "i" };
+//     }
+//     const properties = await Property.find(filterCriteria);
+//     return res.status(200).json({
+//       status: true,
+//       message: "filtered successfully",
+//       data: properties,
+//     });
+//     // res.json(properties);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       status: false,
+//       message: "Internal Server Error",
+//     });
+//   }
+// };
 
 const filterProperties = async (req, res) => {
   try {
     const filters = req.query;
     const filterCriteria = {};
+    
+    // Iterate through the filters and construct the filter criteria object
     for (const [key, value] of Object.entries(filters)) {
-      filterCriteria[key] = { $regex: value, $options: "i" };
+      // Apply different filter conditions based on the filter key
+      switch(key) {
+        case 'location':
+          // For location, search in both the address and mls_number fields
+          filterCriteria.$or = [
+            { "address": { $regex: value, $options: "i" } },
+            { "mls_number": { $regex: value, $options: "i" } }
+          ];
+          break;
+          
+        case 'priceRange':
+          // Handle price range filter
+          // Assuming value is a string in the format "min-max"
+          const [minPrice, maxPrice] = value.split('-');
+          filterCriteria["additional_details.Annual_Property_Taxes"] = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
+          break;
+        case 'beds':
+          // Handle beds filter
+          filterCriteria["bedrooms"] = { $gte: parseInt(value) };
+          break;
+        case 'baths':
+          // Handle baths filter
+          filterCriteria["bathrooms"] = { $gte: parseInt(value) };
+          break;
+        case 'buildingStyle':
+          // Handle building style filter
+          filterCriteria["additional_details.Style"] = { $regex: value, $options: "i" };
+          break;
+        case 'squareFeet':
+          // Handle square feet filter
+          filterCriteria["additional_details.Square_Footage"] = { $gte: parseInt(value) };
+          break;
+        // Add more cases for other filter criteria as needed
+        default:
+          // Handle unknown filter keys
+          break;
+      }
     }
+    
+    // Query properties based on the constructed filter criteria
     const properties = await Property.find(filterCriteria);
+    
     return res.status(200).json({
       status: true,
-      message: "filtered successfully",
+      message: "Filtered successfully",
       data: properties,
     });
-    // res.json(properties);
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -112,6 +170,7 @@ const filterProperties = async (req, res) => {
     });
   }
 };
+
 
 const deleteProperty = async (req, res) => {
   try {
