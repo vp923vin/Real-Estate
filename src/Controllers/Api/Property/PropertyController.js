@@ -92,22 +92,20 @@ const filterProperties = async (req, res) => {
     for (const [key, value] of Object.entries(filters)) {
       // Apply different filter conditions based on the filter key
       switch (key) {
+        // case 'priceRange':
+        //   const [minPrice, maxPrice] = value.split('-');
+        //   filterCriteria["price"] = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
+        //   break;
 
         case "priceRange":
-          // Check if filterCriteria["price"] is defined before using it
-          if (filterCriteria["price"]) {
-              // Assuming value contains a string like "$10-$20"
-              const [minPrice, maxPrice] = value.split("-");
-              // Remove the '$' sign and convert to integer
-              filterCriteria["price"] = parseInt(filterCriteria["price"].replace(/\$/g, ""));
-              // Update price range criteria
-              filterCriteria["price"] = {
-                  $gte: parseInt(minPrice),
-                  $lte: parseInt(maxPrice),
-              };
-          }
+          const [minPrice, maxPrice] = value
+            .split("-")
+            .map((price) => parseInt(price.replace(/\D/g, ""))); // Extract numeric part and convert to integer
+          filterCriteria["price"] = {
+            $gte: minPrice,
+            $lte: maxPrice,
+          };
           break;
-      
 
         case "beds":
           filterCriteria["bedrooms"] = { $gte: parseInt(value) };
