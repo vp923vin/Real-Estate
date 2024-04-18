@@ -85,39 +85,51 @@ const searchProperties = async (req, res) => {
   }
 };
 
-
 const filterProperties = async (req, res) => {
   try {
     const filters = req.query;
     const filterCriteria = {};
     for (const [key, value] of Object.entries(filters)) {
       // Apply different filter conditions based on the filter key
-      switch(key) {
-
-        case 'priceRange':
-          const [minPrice, maxPrice] = value.split('-');
-          console.log(minPrice , maxPrice)
-          filterCriteria["price"] = { $gte: (minPrice), $lte: (maxPrice) };
+      switch (key) {
+        case "priceRange":
+          // Check if filterCriteria["price"] exists and is a string
+          if (typeof filterCriteria["price"] === "string") {
+            // Remove the '$' symbol from the price
+            filterCriteria["price"] = parseInt(
+              filterCriteria["price"].replace(/\$/g, "")
+            );
+            const [minPrice, maxPrice] = value.split("-");
+            filterCriteria["price"] = {
+              $gte: parseInt(minPrice),
+              $lte: parseInt(maxPrice),
+            };
+          }
           break;
 
-        case 'beds':
-
+        case "beds":
           filterCriteria["bedrooms"] = { $gte: parseInt(value) };
           break;
 
-        case 'baths':
+        case "baths":
           filterCriteria["bathrooms"] = { $gte: parseInt(value) };
           break;
 
-        case 'buildingStyle':
-          filterCriteria["additional_details.Building_Type"] = { $regex: value, $options: "i" };
+        case "buildingStyle":
+          filterCriteria["additional_details.Building_Type"] = {
+            $regex: value,
+            $options: "i",
+          };
           break;
 
-        case 'PropertyType':
-          filterCriteria["additional_details.Property_Type"] = { $regex: value, $options: "i" };
+        case "PropertyType":
+          filterCriteria["additional_details.Property_Type"] = {
+            $regex: value,
+            $options: "i",
+          };
           break;
 
-        case 'squareFeet':
+        case "squareFeet":
           filterCriteria["area"] = { $gte: parseInt(value) };
           break;
 
@@ -125,10 +137,10 @@ const filterProperties = async (req, res) => {
           break;
       }
     }
-    
+
     // Query properties based on the constructed filter criteria
     const properties = await Property.find(filterCriteria);
-    
+
     return res.status(200).json({
       status: true,
       message: "Filtered successfully",
@@ -142,7 +154,6 @@ const filterProperties = async (req, res) => {
     });
   }
 };
-
 
 const deleteProperty = async (req, res) => {
   try {
