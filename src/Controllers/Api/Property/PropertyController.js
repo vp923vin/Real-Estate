@@ -58,16 +58,17 @@ const getPropertyWithPagination = async (req, res) => {
   }
 };
 
+
+
 const searchProperties = async (req, res) => {
   try {
     const { location } = req.query;
-    console.log(location);
 
     const filterQuery = {
       $or: [
-        { address: { $regex: location, $options: "i" } },
-        { mls_number: location },
-      ],
+        { "address": { $regex: location, $options: "i" } },
+        { "mls_number": { $regex: location, $options: "i" } }
+      ]
     };
 
     const properties = await Property.find(filterQuery);
@@ -85,6 +86,9 @@ const searchProperties = async (req, res) => {
     });
   }
 };
+
+
+
 
 const filterProperties = async (req, res) => {
   try {
