@@ -67,7 +67,7 @@ const searchProperties = async (req, res) => {
     const filterQuery = {
       $or: [
         { "address": { $regex: location, $options: "i" } },
-        { "mls_number": { $regex: location, $options: "i" } }
+        { "mls_number": location }
       ]
     };
 
