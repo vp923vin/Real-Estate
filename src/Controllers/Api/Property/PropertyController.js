@@ -92,11 +92,13 @@ const filterProperties = async (req, res) => {
     for (const [key, value] of Object.entries(filters)) {
       // Apply different filter conditions based on the filter key
       switch (key) {
-        case 'priceRange':
-          const [minPrice, maxPrice] = value.split('-');
-          filterCriteria["price"] = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
-          break;
-
+        // case 'priceRange':
+        //   const [minPrice, maxPrice] = value.split('-');
+        //   console.log("minPrice:", minPrice);
+        //   console.log("maxPrice:", maxPrice);
+        //   filterCriteria["price"] = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
+        //   break;
+        
         case "beds":
           filterCriteria["bedrooms"] = { $gte: parseInt(value) };
           break;
